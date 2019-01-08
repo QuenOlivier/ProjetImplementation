@@ -4,8 +4,10 @@
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
+#include <time.h>
 #include "asservissement.h"
 #define _USE_MATH_DEFINES
+#define TIMESTEP 0.5 //En secondes
 
 //#include "BBB-eQEP-master/src/bbb-eqep.cpp"
 //Valeurs bornes : x(0,9), y(3, 14)
@@ -32,8 +34,7 @@ Point mgi(Point &posEffecteur){
   //Valeurs physiques du modele
   float a=0.065;
   float b=0.08;
-  float c=0.015;
-  float theta=M_PI/2;
+  //float c=0.015;
   float dx=0.012;
   Point og(-dx/2,0);
   Point od(dx/2,0);
@@ -55,6 +56,35 @@ Point mgi(Point &posEffecteur){
   float phid=acos((a + b*cos(betad))/distd);
 
   return Point(thetag+phig,thetad-phid);
+}
+
+int reachPoint(Point &target){
+  Point angleToReach();
+  angleToReach=mgi(target);
+  //READ ANGLES COURANTS
+
+  //Calcul diff entre angles
+
+  //Calcul vitesse necessaire
+
+  bool reached=false;
+
+  while(!reached){
+    //VERIF QUE LE POINT N'A PAS ETE ATTEINT
+    //READ ANGLES COURANTS
+    if(/*ANGLE 1 PROCHE ET ANGLE 2 PROCHE*/){
+      reached = true;
+    }
+    else if(/*ANGLE 1 SUFFISAMENT PROCHE*/){
+      //RALENTIR MOTEUR 1
+    }
+    else if(/*ANGLE 2 SUFFISAMENT PROCHE*/){
+      //RALENTIR MOTEUR 2
+    }
+
+  }
+  return 1;
+
 }
 
 int main(){
