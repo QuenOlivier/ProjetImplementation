@@ -49,16 +49,20 @@ Point mgi(Point &posEffecteur){
   float thetag=atan2(y,x-og.getX());
   float thetad=atan2(y,x-od.getX());
 
-  float betag=acos(( (x-og.getX())*(x-og.getX()) + y*y - a*a - b*b)/(2*a*b));
+  //Test fonctionnel precedent non optimise
+  /*float betag=acos(( (x-og.getX())*(x-og.getX()) + y*y - a*a - b*b)/(2*a*b));
   float betad=acos(( (x-od.getX())*(x-od.getX()) + y*y - a*a - b*b)/(2*a*b));
 
   float phig=acos((a + b*cos(betag))/distg);
-  float phid=acos((a + b*cos(betad))/distd);
+  float phid=acos((a + b*cos(betad))/distd);*/
+
+  float phig=acos((a*a + distg*distg - b*b)/(2*a*distg));
+  float phid=acos((a*a + distd*distd - b*b)/(2*a*distd));
 
   return Point(thetag+phig,thetad-phid);
 }
 
-int reachPoint(Point &target){
+/*int reachPoint(Point &target){
   Point angleToReach();
   angleToReach=mgi(target);
   //READ ANGLES COURANTS
@@ -72,20 +76,20 @@ int reachPoint(Point &target){
   while(!reached){
     //VERIF QUE LE POINT N'A PAS ETE ATTEINT
     //READ ANGLES COURANTS
-    if(/*ANGLE 1 PROCHE ET ANGLE 2 PROCHE*/){
+    if(ANGLE 1 PROCHE ET ANGLE 2 PROCHE){
       reached = true;
     }
-    else if(/*ANGLE 1 SUFFISAMENT PROCHE*/){
+    else if(ANGLE 1 SUFFISAMENT PROCHE){
       //RALENTIR MOTEUR 1
     }
-    else if(/*ANGLE 2 SUFFISAMENT PROCHE*/){
+    else if(ANGLE 2 SUFFISAMENT PROCHE){
       //RALENTIR MOTEUR 2
     }
 
   }
   return 1;
 
-}
+}*/
 
 int main(){
   Point one(1.0,1.0);

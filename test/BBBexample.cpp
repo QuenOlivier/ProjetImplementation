@@ -1,4 +1,18 @@
-#include "BBBexample.h"
+#include "BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.h"
+#include "BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.h"
+#include <unistd.h>
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
+#include <stdlib.h>
+#include<stdio.h>
+#include <string>
+#include <math.h>
+
+#include "BBB-eQEP-master/src/bbb-eqep.cpp"
+
+
+#include <fstream>      // std::ifstream
 
 
 using std::cout;
@@ -9,7 +23,7 @@ using namespace BBB;
 int posInit=0;
 
 // Retourne la pos brute  du moteur
-Point read_eqep_init(){
+double read_eqep_init(){
   std::ifstream eqep_folder;
   eqep_folder.open("/sys/devices/ocp.3/48304000.epwmss/48304180.eqep/position");
 
@@ -17,12 +31,12 @@ Point read_eqep_init(){
   int copy_eqep;
   eqep_folder >> copy_eqep;
   cout<<"posInit : "<< copy_eqep<<endl;
-  return Point res(copy_eqep,0);
+  return copy_eqep; 
 
 }
 
 // Retourne la pos en radians  du moteur
-Point read_eqep(){
+double read_eqep(){ 
   std::ifstream eqep_folder;
   eqep_folder.open("/sys/devices/ocp.3/48304000.epwmss/48304180.eqep/position");
 
@@ -37,9 +51,7 @@ Point read_eqep(){
   cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
   cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
 
-  Point angles(pos/(360*4)*2*M_PI,0);
-
-  return angles;
+  return pos/(360*4)*2*M_PI;
 
 }
 
@@ -139,7 +151,7 @@ int main(int argc, char const *argv[]) {
   }
   if (strtol(argv[1],NULL,0) >= 0 && strtol(argv[1],NULL,0) <= 2) {
     eqep_num = strtol(argv[1],NULL,0);
-  }
+  } 
   else {
     cout << "Try again." << endl;
     return 1;
@@ -149,19 +161,17 @@ int main(int argc, char const *argv[]) {
   std::system("config-pin P8.11 qep" );
   std::system("config-pin P8.12 qep" );
   std::system("config-pin P8.19 pwm" );
-
+  
   eQEP eqep(eqep_num);
 
   //Lecture encodeur
-  Point eqepInit();
-  eqepInit = read_eqep_init(); // Stockage de la pos init brute
-  posInit= eqepInit.getX();
+  posInit = read_eqep_init(); // Stockage de la pos init brute
 
   //on va utiliser la pin P8_7 pour commander le sens de rotation du moteur
   std::system("config-pin P8.7 output");
-
+  
   //std::system("echo 1 > "); //1 : sens anti-trigonometrique vu du dessus du moteur ; et 0 : sens trigo
-
+  
  //Ecriture period, duty, run
   write_period_ns(90000);
   usleep(500000); //pour laisser le temps a write_period_ns d'ecrire dans la BBB
@@ -170,10 +180,9 @@ int main(int argc, char const *argv[]) {
   set_run();
   usleep(500000);
 
-  Point pos();
-  pos = read_eqep();  //
-  while(pos.getX() > -10){
-
+  double pos = read_eqep();  //
+  while(pos > -10){
+    
     //Lecture encodeur
     pos = read_eqep();
     usleep(100000);
@@ -203,7 +212,7 @@ int main(int argc, char const *argv[]) {
 
 /*Connection à la carte :
 ssh debian@192.168.7.2
-dans un autre terminal, envoyer le fichier ProjetImplementation à la carte : scp -r ProjetImplementation debian@192.168.7.2:.
+dans un autre terminal, envoyer le fichier ProjetImplementation à la carte : scp -r ProjetImplementation debian@192.168.7.2:. 
 retourner dans le terminal de la carte, puis dans ProjetImplementation compiler le tout : g++ BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.cpp  BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.cpp BBBexample.cpp -o BBBexample
 executer le code (en root (commande : sudo su)(exit root)) : ./BBBexample 2
 pour acceder a period_ns, duty_ns, run du pwm que vous avez cree dans le programme : cd /sys/class/pwm/"pwm que vous avez cree"
@@ -224,12 +233,12 @@ Pour passer un pin en mode eqep
 config-pin overlay cape-universaln
 config-pin P8.11 qep (si le pin 8.11)
 
-chemin des pinumx : /sys/devices/ocp.3/
+chemin des pinumx : /sys/devices/ocp.3/  
 
 */
 
 
-/*
+/* 
 Encodeur test :
 valeur 1 :  105117929
 valeur 2 :  105117929
@@ -241,7 +250,7 @@ valeur 3 : 3196839520
 
 
 
-//to do
+//to do 
 /*
 write_pwm()
 read_qep()

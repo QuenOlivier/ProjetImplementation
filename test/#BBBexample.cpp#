@@ -1,0 +1,185 @@
+#include "BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.h"
+#include "BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.h"
+#include <unistd.h>
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
+#include <stdlib.h>
+#include <string>
+
+#include "BBB-eQEP-master/src/bbb-eqep.cpp"
+
+
+#include <fstream>      // std::ifstream
+
+
+using std::cout;
+using std::endl;
+using namespace BBB;
+
+#define MOTOR_TWO 2
+
+/*
+void write_pwm_duty(int pwm_num, int duty){
+  std::ostringstream buff;
+  //Si on est sur le pwm 2 (2A)
+  if(pwm_num == MOTOR_TWO){
+    buff << "echo "<<duty<<" > /sys/class/pwm/pwm5/duty_ns";
+    std::system(buff.str());
+  }
+}
+*/
+
+//fonction pour lire la valeur d'un encodeur
+int read_qep(int pwm){
+  if(pwm==2){
+  std::ifstream is ("/sys/devices/ocp.3/48304000.epwmss/48304180.eqep/position", std::ifstream::binary);
+
+  int length = is.tellg();
+  char * buffer = new char [length];
+
+  std::cout << "Reading " << length << " characters... "<< endl;
+  // read data as a block:
+  is.read (buffer,length);
+  std::cout << "buffer : " << buffer << endl;
+  }
+  return 0;
+}
+
+
+
+
+ 
+int main(int argc, char const *argv[]) {
+
+  int eqep_num;
+  uint32_t eqep_pos =0;
+
+  if(argc < 2)
+  {
+    cout << "Usage: " << argv[0] << " 0|1|2" << endl;
+    cout << "Requires the number for which eQEP to open\n";
+    return 1;
+  }
+  if (strtol(argv[1],NULL,0) >= 0 && strtol(argv[1],NULL,0) <= 2) {
+    eqep_num = strtol(argv[1],NULL,0);
+  } 
+  else {
+    cout << "Try again." << endl;
+    return 1;
+  }
+
+
+  std::system("config-pin overlay cape-universaln");
+  std::system("config-pin P8.11 qep" );
+  std::system("config-pin P8.12 qep" );
+  
+
+  //gp->setDirection(pin, GPIO::OUTPUT);
+ 
+
+  eQEP eqep(eqep_num);
+
+  //eqep.setPosInit(0);
+
+  /*while(1){
+  eqep_pos = eqep.getPosition();
+  printf("position encodeur : %d\n", eqep_pos);
+  }*/
+
+/*
+std::system("cat /sys/devices/ocp.3/48304000.epwmss/48304180.eqep/position ");
+ 
+   for(int i=0;i<100;i++){
+    //printf("\reqep: %zu       ",eqep.getPosition());
+    std::system("cat /sys/devices/ocp.3/48304000.epwmss/48304180.eqep/position ");
+    usleep(5000);
+  }
+*/  
+
+std::system("echo 500000 > /sys/class/pwm/pwm5/period_ns");
+std::system("echo 250000 > /sys/class/pwm/pwm5/duty_ns");
+std::system("echo 1 > /sys/class/pwm/pwm5/run");  
+
+
+int read_result = read_qep(2);
+
+
+/*
+  //Prog pour la led
+
+  GPIO::GPIOManager* gp = GPIO::GPIOManager::getInstance();
+  int pin = GPIO::GPIOConst::getInstance()->getGpioByKey("P8_7");
+
+  std::system("echo 66 > /sys/class/gpio/export");
+  std::system("echo ""out"" > /sys/class/gpio/gpio66/direction");
+
+  while(true){
+      gp->setValue(pin, GPIO::HIGH);
+      sleep(1);
+      gp->setValue(pin, GPIO::LOW);
+      sleep(1);
+  }
+ 
+  gp->~GPIOManager();
+*/
+
+
+  return 0;
+}
+
+
+//Compilation
+//g++ BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.cpp  BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.cpp BBBexample.cpp -o BBBexample
+
+
+// 3674050@pc4139:/nfs/home/sasl/eleves/rob/3674050/ProjetImplementation$ scp BBBexample 3674050@134.157.104.139:debian@192.168.7.2
+
+
+//scp BBBexample debian@192.168.7.2:~/
+
+
+/*Connection à la carte :
+ ssh debian@192.168.7.2
+dans un autre terminal, envoyer le fichier ProjetImplementation à la carte : scp -r ProjetImplementation debian@192.168.7.2:. 
+retourner dans le terminal de la carte, puis dans ProjetImplementation compiler le tout : g++ BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.cpp  BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.cpp BBBexample.cpp -o BBBexample
+executer le code : ./BBBexample
+
+
+Pour allumer et eteindre une led à la main depuis le terminal de la beaglebone :
+
+dans sys/class/gpio : echo 66 > export    (avec 66 le numero du GPIO qui nous interesse)
+dans sys/class/gpio/gpio66 : echo "out" > direction   (pour dire que l'on veut que ce gpio soit une sortie)
+dans sys/class/gpio/gpio66 : echo 1 > value   (pour allumer la led)
+dans sys/class/gpio/gpio66 : echo 0 > value   (pour éteindre la led)
+
+
+Pour un encodeur. Brancher le canal A de l'encodeur au pin P8_12 (EQEP2A_in en mode 4). Brancher le canal B de l'encodeur au Pin P8_11 (EQEP2B_in en mode 4).
+
+Pour passer un pin en mode eqep
+config-pin overlay cape-universaln
+config-pin P8.11 qep (si le pin 8.11)
+
+chemin des pinumx : /sys/devices/ocp.3/  
+
+*/
+
+
+/* 
+Encodeur test :
+valeur 1 :  105117929
+valeur 2 :  105117929
+valeur 3 : 3196839520
+
+*/
+
+
+
+
+
+//to do 
+/*
+write_pwm()
+read_qep()
+
+*/
