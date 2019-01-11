@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <stdio.h>
 #include <math.h>
+#include "BBBexample.h"
 
 class Point{
   private:
@@ -21,3 +22,6 @@ class Point{
     float getY(){return this->_y;}
     float dist(Point &cible);
 };
+
+Point mgi(Point &posEffecteur);
+int reachPoint(Point &target);

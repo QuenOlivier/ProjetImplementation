@@ -62,34 +62,46 @@ Point mgi(Point &posEffecteur){
   return Point(thetag+phig,thetad-phid);
 }
 
-/*int reachPoint(Point &target){
+int reachPoint(Point &target){
   Point angleToReach();
   angleToReach=mgi(target);
-  //READ ANGLES COURANTS
+  Point angleCurrent(read_eqep(1),read_eqep(2));
 
   //Calcul diff entre angles
+  Point diff(angleToReach.getX()-angleCurrent.getX(),angleToReach.getY()-angleCurrent.getY());
 
   //Calcul vitesse necessaire
+  diff.set(diff.getX()/(2*M_PI),diff.getY()/(2*M_PI));
+  Point speeds(diff.getX()*60/TIMESTEP,diff.getY()*60/TIMESTEP);
 
+  //Lancement des moteurs
+  set_speed(speeds);
   bool reached=false;
 
   while(!reached){
     //VERIF QUE LE POINT N'A PAS ETE ATTEINT
-    //READ ANGLES COURANTS
-    if(ANGLE 1 PROCHE ET ANGLE 2 PROCHE){
+    angleCurrent.set(read_eqep(1),read_eqep(2));
+    double motor1=angleCurrent.getX();
+    double motor2=angleCurrent.getY();
+
+    bool angle1= (motor1 < angleToReach.getX()*1.01)&&(motor1 > angleToReach.getX()*0.99);
+    bool angle2= (motor2 < angleToReach.getY()*1.01)&&(motor1 > angleToReach.getY()*0.99);
+    if(angle1 && angle2){
       reached = true;
     }
-    else if(ANGLE 1 SUFFISAMENT PROCHE){
-      //RALENTIR MOTEUR 1
+    else if(angle1){
+      speeds.setX(speeds.getX()*0.75);
+      set_speed(speeds);
     }
-    else if(ANGLE 2 SUFFISAMENT PROCHE){
-      //RALENTIR MOTEUR 2
+    else if(angle2){
+      speeds.setY(speeds.getY()*0.75);
+      set_speed(speeds);
     }
 
   }
   return 1;
 
-}*/
+}
 
 int main(){
   Point one(1.0,1.0);
