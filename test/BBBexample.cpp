@@ -61,8 +61,9 @@ double read_eqep(int moteur){
 
     double pos = copy_eqep - posInit_M1;
 
-    cout<<"pos (brut): "<< pos<<endl;
-    cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
+    cout<<"Moteur 1 "<<endl;
+    //cout<<"pos (brut): "<< pos<<endl;
+    //cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
     cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
 
     return pos/(360*4)*2*M_PI;
@@ -79,12 +80,11 @@ double read_eqep(int moteur){
 
     double pos = copy_eqep - posInit_M2;
 
-    cout<<"copy eqep : "<< copy_eqep<<endl;                   // -23059574
-    cout<<"posInit : "<< posInit_M2<<endl;
-
-
-    cout<<"pos (brut): "<< pos<<endl;
-    cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
+    cout<<"Moteur 2 "<<endl;
+    //cout<<"copy eqep : "<< copy_eqep<<endl;                   // -23059574
+    //cout<<"posInit : "<< posInit_M2<<endl;
+    //cout<<"pos (brut): "<< pos<<endl;
+    //cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
     cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
 
     return pos/(360*4)*2*M_PI;
@@ -265,7 +265,7 @@ void initialisation_pins(){
 
 
   //Moteur 1
-  std::system("config-pin P9.27 qep" );
+  std::system("config-pin P9.27 qep" );	
   std::system("config-pin P9.92 qep" );
   std::system("config-pin P8.19 pwm" );   //E1
   std::system("config-pin P8.7 output");  //(gpio66) pour commander le sens de rotation //M1
@@ -311,17 +311,18 @@ int main(int argc, char const *argv[]) {
   //Lecture encodeur
   read_eqep_init(); // Stockage de la pos init brute
 
-  sens_rotation(1,0);
+  sens_rotation(1,1);
+  sens_rotation(2,1);
 
  //Ecriture period, duty, run
   reset_run();
   write_period_ns(1,90000);
   usleep(500000); //pour laisser le temps a write_period_ns d'ecrire dans la BBB
-  write_duty_ns(1,15000);//P8.19
+  write_duty_ns(1,51000);//P8.19
   usleep(500000);
   write_period_ns(2,90000);
   usleep(500000); //pour laisser le temps a write_period_ns d'ecrire dans la BBB
-  write_duty_ns(2,75000); //P8.13
+  write_duty_ns(2,51000); //P8.13
   usleep(500000);
   set_run();
   usleep(500000);
@@ -330,7 +331,7 @@ int main(int argc, char const *argv[]) {
   double pos2 = read_eqep(2);
   int count=0;
   //while(count < 50){
-  while(count < 200000){
+  while(count < 200){
     //Lecture encodeur
     pos1 = read_eqep(1);
     pos2 = read_eqep(2);
