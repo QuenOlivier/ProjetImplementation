@@ -21,120 +21,267 @@ using namespace BBB;
 
 #define MOTOR_TWO 2
 int posInit=0;
+int posInit_M1=0;
+int posInit_M2=0;
 
 // Retourne la pos brute  du moteur
-double read_eqep_init(){
-  std::ifstream eqep_folder;
-  eqep_folder.open("/sys/devices/ocp.3/48304000.epwmss/48304180.eqep/position");
+void read_eqep_init(){
+  std::ifstream eqep_folder_m1;
+  eqep_folder_m1.open("/sys/devices/ocp.3/48300000.epwmss/48300180.eqep/position");
+
+  std::ifstream eqep_folder_m2;
+  eqep_folder_m2.open("/sys/devices/ocp.3/48304000.epwmss/48304180.eqep/position");
+
 
   //std::string copy_eqep;
-  int copy_eqep;
-  eqep_folder >> copy_eqep;
-  cout<<"posInit : "<< copy_eqep<<endl;
-  return copy_eqep; 
+  int copy_eqep1;
+  int copy_eqep2;
+  eqep_folder_m1 >> copy_eqep1;
+  eqep_folder_m2 >> copy_eqep2;
+  cout<<"posInit1 : "<< copy_eqep1<<endl;
+  cout<<"posInit2 : "<< copy_eqep2<<endl;                             
+
+  //Lecture encodeur
+  posInit_M1 = copy_eqep1; // Stockage de la pos init brute
+  posInit_M2 = copy_eqep2; // Stockage de la pos init brute
+ 
 
 }
 
 // Retourne la pos en radians  du moteur
-double read_eqep(){ 
-  std::ifstream eqep_folder;
-  eqep_folder.open("/sys/devices/ocp.3/48304000.epwmss/48304180.eqep/position");
+double read_eqep(int moteur){
+  if(moteur == 1){ 
+    std::ifstream eqep_folder;
+    eqep_folder.open("/sys/devices/ocp.3/48300000.epwmss/48300180.eqep/position");
 
-  //std::string copy_eqep;
-  int copy_eqep;
-  eqep_folder >> copy_eqep;
-  //double eqep = copy_eqep/(360*4);
+    //std::string copy_eqep;
+    int copy_eqep;
+    eqep_folder >> copy_eqep;
+    //double eqep = copy_eqep/(360*4);
 
-  double pos = copy_eqep - posInit;
+    double pos = copy_eqep - posInit_M1;
 
-  cout<<"pos (brut): "<< pos<<endl;
-  cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
-  cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
+    cout<<"pos (brut): "<< pos<<endl;
+    cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
+    cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
 
-  return pos/(360*4)*2*M_PI;
+    return pos/(360*4)*2*M_PI;
+  }
+  else if(moteur == 2){
+
+    std::ifstream eqep_folder;
+    eqep_folder.open("/sys/devices/ocp.3/48304000.epwmss/48304180.eqep/position");
+
+    //std::string copy_eqep;
+    int copy_eqep;
+    eqep_folder >> copy_eqep;
+    //double eqep = copy_eqep/(360*4);
+
+    double pos = copy_eqep - posInit_M2;
+
+    cout<<"copy eqep : "<< copy_eqep<<endl;                   // -23059574
+    cout<<"posInit : "<< posInit_M2<<endl;
+
+
+    cout<<"pos (brut): "<< pos<<endl;
+    cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
+    cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
+
+    return pos/(360*4)*2*M_PI;
+  }
+  else{
+    cout<<"Mauvais numéro de moteur"<<endl;
+    return -1;
+  }
 
 }
 
+
 // Ecriture period_ns
-void write_period_ns(int p){
-  char buffer[50];
-  char buffer2[200] = "echo ";
-  char buffer3[100] = " > /sys/class/pwm/pwm5/period_ns";
-  int n;
+void write_period_ns(int moteur, int p){
+  if(moteur ==1){  
+    char buffer[50];
+    char buffer2[200] = "echo ";
+    char buffer3[100] = " > /sys/class/pwm/pwm5/period_ns";
+    int n;
 
-  n=sprintf(buffer,"%d",p);
-  for(int i =0; i<n;i++){
-    buffer2[5+i] = buffer[i];
+    n=sprintf(buffer,"%d",p);
+    for(int i =0; i<n;i++){
+      buffer2[5+i] = buffer[i];
+    }
+    int c=0;
+    for(int j=0;j<35;j++){  //utiliser sprintf pour avoir la longueur !!!
+      buffer2[5+n+j] = buffer3[j];
+    }
+    cout<<"buffer :" << buffer2 <<endl;
+    std::system(buffer2);
   }
-  int c=0;
-  for(int j=0;j<35;j++){  //utiliser sprintf pour avoir la longueur !!!
-    buffer2[5+n+j] = buffer3[j];
-  }
-  cout<<"buffer :" << buffer2 <<endl;
-  std::system(buffer2);
+  else if(moteur ==2){  
+    char buffer[50];
+    char buffer2[200] = "echo ";
+    char buffer3[100] = " > /sys/class/pwm/pwm6/period_ns";
+    int n;
 
+    n=sprintf(buffer,"%d",p);
+    for(int i =0; i<n;i++){
+      buffer2[5+i] = buffer[i];
+    }
+    int c=0;
+    for(int j=0;j<35;j++){  //utiliser sprintf pour avoir la longueur !!!
+      buffer2[5+n+j] = buffer3[j];
+    }
+    cout<<"buffer :" << buffer2 <<endl;
+    std::system(buffer2);
+  }
+  else{
+    cout<<"Mauvais numéro de moteur"<<endl;
+  }
 }
 
 // Ecriture duty_ns
-void write_duty_ns(int d){
-  char buffer[50];
-  char buffer2[200] = "echo ";
-  char buffer3[100] = " > /sys/class/pwm/pwm5/duty_ns";
-  int n;
+void write_duty_ns(int moteur, int d){
+  if(moteur == 1){  
+    char buffer[50];
+    char buffer2[200] = "echo ";
+    char buffer3[100] = " > /sys/class/pwm/pwm5/duty_ns";
+    int n;
 
-  n=sprintf(buffer,"%d",d);
-  for(int i =0; i<n;i++){
-    buffer2[5+i] = buffer[i];
+    n=sprintf(buffer,"%d",d);
+    for(int i =0; i<n;i++){
+      buffer2[5+i] = buffer[i];
+    }
+    int c=0;
+    for(int j=0;j<33;j++){  //utiliser sprintf pour avoir la longueur !!!
+      buffer2[5+n+j] = buffer3[j];
+    }
+    cout<<"buffer :" << buffer2 <<endl;
+    std::system(buffer2);
   }
-  int c=0;
-  for(int j=0;j<33;j++){  //utiliser sprintf pour avoir la longueur !!!
-    buffer2[5+n+j] = buffer3[j];
-  }
-  cout<<"buffer :" << buffer2 <<endl;
-  std::system(buffer2);
+  else if(moteur == 2){  
+    char buffer[50];
+    char buffer2[200] = "echo ";
+    char buffer3[100] = " > /sys/class/pwm/pwm6/duty_ns";
+    int n;
 
+    n=sprintf(buffer,"%d",d);
+    for(int i =0; i<n;i++){
+      buffer2[5+i] = buffer[i];
+    }
+    int c=0;
+    for(int j=0;j<33;j++){  //utiliser sprintf pour avoir la longueur !!!
+      buffer2[5+n+j] = buffer3[j];
+    }
+    cout<<"buffer :" << buffer2 <<endl;
+    std::system(buffer2);
+  }
+  else{
+    cout<<"Mauvais numéro de moteur"<<endl;
+  }
 }
 
 // Run à 1
 void set_run(){
   char buffer[50];
-  char buffer2[200] = "echo ";
-  char buffer3[100] = " > /sys/class/pwm/pwm5/run";
+  char buffer2_m1[200] = "echo ";
+  char buffer2_m2[200] = "echo ";
+  char buffer3_m1[100] = " > /sys/class/pwm/pwm5/run";
+  char buffer3_m2[100] = " > /sys/class/pwm/pwm6/run";
   int n;
 
   n=sprintf(buffer,"%d",1);
   for(int i =0; i<n;i++){
-    buffer2[5+i] = buffer[i];
+    buffer2_m1[5+i] = buffer[i];
+    buffer2_m2[5+i] = buffer[i];
   }
   int c=0;
   for(int j=0;j<29;j++){  //utiliser sprintf pour avoir la longueur !!!
-    buffer2[5+n+j] = buffer3[j];
+    buffer2_m1[5+n+j] = buffer3_m1[j];
+    buffer2_m2[5+n+j] = buffer3_m2[j];
   }
-  cout<<"buffer :" << buffer2 <<endl;
-  std::system(buffer2);
-
+  cout<<"buffer :" << buffer2_m1 <<endl;
+  cout<<"buffer :" << buffer2_m2 <<endl;
+  std::system(buffer2_m1);
+  std::system(buffer2_m2);
 }
 
 // Run à 0
 void reset_run(){
   char buffer[50];
-  char buffer2[200] = "echo ";
-  char buffer3[100] = " > /sys/class/pwm/pwm5/run";
+  char buffer2_m1[200] = "echo ";
+  char buffer2_m2[200] = "echo ";
+  char buffer3_m1[100] = " > /sys/class/pwm/pwm5/run";
+  char buffer3_m2[100] = " > /sys/class/pwm/pwm6/run";
   int n;
 
   n=sprintf(buffer,"%d",0);
   for(int i =0; i<n;i++){
-    buffer2[5+i] = buffer[i];
+    buffer2_m1[5+i] = buffer[i];
+    buffer2_m2[5+i] = buffer[i];
   }
   int c=0;
   for(int j=0;j<29;j++){  //utiliser sprintf pour avoir la longueur !!!
-    buffer2[5+n+j] = buffer3[j];
+    buffer2_m1[5+n+j] = buffer3_m1[j];
+    buffer2_m2[5+n+j] = buffer3_m2[j];
   }
-  cout<<"buffer :" << buffer2 <<endl;
-  std::system(buffer2);
+  cout<<"buffer :" << buffer2_m1 <<endl;
+  cout<<"buffer :" << buffer2_m2 <<endl;
+  std::system(buffer2_m1);
+  std::system(buffer2_m2);
 
 }
+// Moteur 1 ou 2 (pour moteur gauche ou droite) et sens 0 ou 1 (pour sens trigo ou anti)
+void sens_rotation(int moteur, int sens){
+  if(moteur == 1){
+    if(sens==0){
+      std::system("echo 0 > /sys/devices/virtual/gpio/gpio66/value");
+    }
+    else if(sens ==1){
+      std::system("echo 1 > /sys/devices/virtual/gpio/gpio66/value");
+    }
+    else{
+      cout<<"Sens invalide (saisir 0 pour trigo ou 1)"<<endl;
+    }
+  }
+  else if(moteur == 2){
+    if(sens==0){
+      std::system("echo 0 > /sys/devices/virtual/gpio/gpio67/value");
+    }
+    else if(sens ==1){
+      std::system("echo 1 > /sys/devices/virtual/gpio/gpio67/value");
+    }
+    else{
+      cout<<"Sens invalide (saisir 0 pour trigo ou 1)"<<endl;
+    }
+  }
+  else{
+    cout<<"Numéro de moteur invalide (saisir 1 ou 2)"<<endl;
+  }
+}
 
+// Initialise les pins en tous genres : eqep, pwm, etc... utilises par les deux moteurs
+void initialisation_pins(){
+
+  std::system("config-pin overlay cape-universaln");
+
+
+  //Moteur 1
+  std::system("config-pin P9.27 qep" );
+  std::system("config-pin P9.92 qep" );
+  std::system("config-pin P8.19 pwm" );   //E1
+  std::system("config-pin P8.7 output");  //(gpio66) pour commander le sens de rotation //M1
+  std::system("echo 5 > /sys/class/pwm/export");
+
+  //Moteur 2
+  std::system("config-pin P8.11 qep" ); //Pour Pauline : fil bleu
+  std::system("config-pin P8.12 qep" ); //Pour Pauline : fil jaune
+  std::system("config-pin P8.13 pwm" );   //E2
+  std::system("config-pin P8.8 output");   //(gpio67) pour commander le sens de rotation //M2
+  std::system("echo 6 > /sys/class/pwm/export");
+
+  
+
+
+}
 
 
 
@@ -157,35 +304,38 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
-  std::system("config-pin overlay cape-universaln");
-  std::system("config-pin P8.11 qep" );
-  std::system("config-pin P8.12 qep" );
-  std::system("config-pin P8.19 pwm" );
+  initialisation_pins();
   
+  //EQUEP
   eQEP eqep(eqep_num);
-
   //Lecture encodeur
-  posInit = read_eqep_init(); // Stockage de la pos init brute
+  read_eqep_init(); // Stockage de la pos init brute
 
-  //on va utiliser la pin P8_7 pour commander le sens de rotation du moteur
-  std::system("config-pin P8.7 output");
-  
-  //std::system("echo 1 > "); //1 : sens anti-trigonometrique vu du dessus du moteur ; et 0 : sens trigo
-  
+  sens_rotation(1,0);
+
  //Ecriture period, duty, run
-  write_period_ns(90000);
+  reset_run();
+  write_period_ns(1,90000);
   usleep(500000); //pour laisser le temps a write_period_ns d'ecrire dans la BBB
-  write_duty_ns(75000);
+  write_duty_ns(1,15000);//P8.19
+  usleep(500000);
+  write_period_ns(2,90000);
+  usleep(500000); //pour laisser le temps a write_period_ns d'ecrire dans la BBB
+  write_duty_ns(2,75000); //P8.13
   usleep(500000);
   set_run();
   usleep(500000);
 
-  double pos = read_eqep();  //
-  while(pos > -10){
-    
+  double pos1 = read_eqep(1); 
+  double pos2 = read_eqep(2);
+  int count=0;
+  //while(count < 50){
+  while(count < 200000){
     //Lecture encodeur
-    pos = read_eqep();
-    usleep(100000);
+    pos1 = read_eqep(1);
+    pos2 = read_eqep(2);
+    usleep(1000);
+    count++;
   }
   reset_run();
 
@@ -256,11 +406,6 @@ write_pwm()
 read_qep()
 
 */
-
-
-
-
-
 
 
 
