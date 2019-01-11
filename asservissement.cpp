@@ -1,10 +1,4 @@
-#include "BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.h"
-#include "BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.h"
-#include <unistd.h>
-#include <cstdlib>
-#include <iostream>
-#include <cmath>
-#include <time.h>
+
 #include "asservissement.h"
 #define _USE_MATH_DEFINES
 #define TIMESTEP 0.5 //En secondes
@@ -62,9 +56,10 @@ Point mgi(Point &posEffecteur){
   return Point(thetag+phig,thetad-phid);
 }
 
-int reachPoint(Point &target){
+int reach_point(Point &target){
   Point angleToReach();
   angleToReach=mgi(target);
+  cout<<"Angle :\nAlpha :"<<angleToReach.getX()<<", Beta :"<<angleToReach.getY()<<endl;
   Point angleCurrent(read_eqep(1),read_eqep(2));
 
   //Calcul diff entre angles
@@ -103,7 +98,15 @@ int reachPoint(Point &target){
 
 }
 
-int main(){
+int follow_path(std::list<Point> path){
+  while(path.size() != 0){
+    reach_point(path.front());
+    path.pop_front();
+  }
+  return 1;
+}
+
+/*int main(){
   Point one(1.0,1.0);
   Point second(2.0,2.0);
   cout<<"Distance = "<<one.dist(second)<<endl;
@@ -113,3 +116,4 @@ int main(){
   cout<<"Angle :\nAlpha :"<<res.getX()<<", Beta :"<<res.getY()<<endl;
 
 }
+*/

@@ -2,6 +2,12 @@
 #include <cstdlib>
 #include <stdio.h>
 #include <math.h>
+#include "BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.h"
+#include "BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.h"
+#include <iostream>
+#include <cmath>
+#include <time.h>
+#include <list>
 #include "BBBexample.h"
 
 class Point{
@@ -24,4 +30,5 @@ class Point{
 };
 
 Point mgi(Point &posEffecteur);
-int reachPoint(Point &target);
+int reach_point(Point &target);
+int follow_path(std::list<Point> path);

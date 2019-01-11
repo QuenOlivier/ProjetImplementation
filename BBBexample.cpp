@@ -6,7 +6,7 @@ using std::endl;
 using namespace BBB;
 
 #define MOTOR_TWO 2
-#define PERIOD 90000
+#define PERIOD 100000
 int posInit=0;
 int posInit_M1=0;
 int posInit_M2=0;
@@ -14,7 +14,7 @@ int posInit_M2=0;
 // Sauvegarde la pos brute initiale du moteur
 void read_eqep_init(){
   std::ifstream eqep_folder_m1;
-  eqep_folder_m1.open("/sys/devices/ocp.3/48302000.epwmss/48302180.eqep/position");
+  eqep_folder_m1.open("/sys/devices/ocp.3/48300000.epwmss/48300180.eqep/position");
 
   std::ifstream eqep_folder_m2;
   eqep_folder_m2.open("/sys/devices/ocp.3/48304000.epwmss/48304180.eqep/position");
@@ -31,15 +31,13 @@ void read_eqep_init(){
   //Lecture encodeur
   posInit_M1 = copy_eqep1; // Stockage de la pos init brute
   posInit_M2 = copy_eqep2; // Stockage de la pos init brute
-
-
 }
 
 // Retourne la pos en radians  du moteur
 double read_eqep(int moteur){
   if(moteur == 1){
     std::ifstream eqep_folder;
-    eqep_folder.open("/sys/devices/ocp.3/48302000.epwmss/48302180.eqep/position");
+    eqep_folder.open("/sys/devices/ocp.3/48300000.epwmss/48300180.eqep/position");
 
     //std::string copy_eqep;
     int copy_eqep;
@@ -48,8 +46,9 @@ double read_eqep(int moteur){
 
     double pos = copy_eqep - posInit_M1;
 
-    cout<<"pos (brut): "<< pos<<endl;
-    cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
+    cout<<"Moteur 1 "<<endl;
+    //cout<<"pos (brut): "<< pos<<endl;
+    //cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
     cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
 
     return pos/(360*4)*2*M_PI;
@@ -66,8 +65,11 @@ double read_eqep(int moteur){
 
     double pos = copy_eqep - posInit_M2;
 
-    cout<<"pos (brut): "<< pos<<endl;
-    cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
+    cout<<"Moteur 2 "<<endl;
+    //cout<<"copy eqep : "<< copy_eqep<<endl;                   // -23059574
+    //cout<<"posInit : "<< posInit_M2<<endl;
+    //cout<<"pos (brut): "<< pos<<endl;
+    //cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
     cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
 
     return pos/(360*4)*2*M_PI;
@@ -250,15 +252,15 @@ void initialisation_pins(){
   //Moteur 1
   std::system("config-pin P9.27 qep" );
   std::system("config-pin P9.92 qep" );
-  std::system("config-pin P8.13 pwm" ); //E1
-  std::system("config-pin P8.7 output"); //(gpio66) pour commander le sens de rotation //M1
+  std::system("config-pin P8.19 pwm" );   //E1
+  std::system("config-pin P8.7 output");  //(gpio66) pour commander le sens de rotation //M1
   std::system("echo 5 > /sys/class/pwm/export");
 
   //Moteur 2
-  std::system("config-pin P8.11 qep" );
-  std::system("config-pin P8.12 qep" );
-  std::system("config-pin P8.19 pwm" );//E2
-  std::system("config-pin P8.8 output");//(gpio67) pour commander le sens de rotation //M2
+  std::system("config-pin P8.11 qep" ); //Pour Pauline : fil bleu
+  std::system("config-pin P8.12 qep" ); //Pour Pauline : fil jaune
+  std::system("config-pin P8.13 pwm" );   //E2
+  std::system("config-pin P8.8 output");   //(gpio67) pour commander le sens de rotation //M2
   std::system("echo 6 > /sys/class/pwm/export");
 
 
@@ -270,19 +272,19 @@ void initialisation_pins(){
 void set_speed(Point speeds){
   coef= 100 / (MAX_SPEED * REDUC);
   if(speeds.getX()>0){
-    write_duty_ns(1,int((0.5+0.5*speeds.getX()*coef)*PERIOD);
+    write_duty_ns(1,int((speeds.getX()*coef)*PERIOD);
     sens_rotation(1,0);
   }
   else{
-    write_duty_ns(1,(0.5-0.5*speeds.getX()*coef)*PERIOD);
+    write_duty_ns(1,int((-speeds.getX()*coef)*PERIOD));
     sens_rotation(1,1);
   }
   if(speeds.getY()>0){
-    write_duty_ns(2,int((0.5+0.5*speeds.getY()*coef)*PERIOD);
+    write_duty_ns(2,int((speeds.getY()*coef)*PERIOD);
     sens_rotation(2,0);
   }
   else{
-    write_duty_ns(2,(0.5-0.5*speeds.getY()*coef)*PERIOD);
+    write_duty_ns(2,int((-speeds.getY()*coef)*PERIOD));
     sens_rotation(2,1);
   }
 
@@ -314,30 +316,27 @@ int main(int argc, char const *argv[]) {
   //Lecture encodeur
   read_eqep_init(); // Stockage de la pos init brute
 
-  sens_rotation(1,0);
+  sens_rotation(1,1);
+  sens_rotation(2,1);
 
  //Ecriture period, duty, run
-  write_period_ns(1,PERIOD);
+  reset_run();
+  write_period_ns(2,PERIOD);
   usleep(500000); //pour laisser le temps a write_period_ns d'ecrire dans la BBB
-  write_duty_ns(1,75000);
+  write_duty_ns(2,51000); //P8.13
   usleep(500000);
   set_run();
   usleep(500000);
 
-  double pos1 = read_eqep(1);
-  double pos2 = read_eqep(2);
-  int count=0;
-  while(count < 50){
-    //Lecture encodeur
-    pos1 = read_eqep(1);
-    pos2 = read_eqep(2);
-    usleep(1000);
-    count++;
-  }
+  Point test(0,0.1);
+
+  reach_point(test);
+  
   reset_run();
 
   return 0;
 }
+
 
 
 
