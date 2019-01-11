@@ -1,7 +1,6 @@
 
-#include "asservissement.h"
-#define _USE_MATH_DEFINES
-#define TIMESTEP 0.5 //En secondes
+#include "asservissement.hpp"
+
 
 //#include "BBB-eQEP-master/src/bbb-eqep.cpp"
 //Valeurs bornes : x(0,9), y(3, 14)
@@ -57,8 +56,7 @@ Point mgi(Point &posEffecteur){
 }
 
 int reach_point(Point &target){
-  Point angleToReach();
-  angleToReach=mgi(target);
+  Point angleToReach=mgi(target);
   cout<<"Angle :\nAlpha :"<<angleToReach.getX()<<", Beta :"<<angleToReach.getY()<<endl;
   Point angleCurrent(read_eqep(1),read_eqep(2));
 
@@ -95,6 +93,28 @@ int reach_point(Point &target){
 
   }
   return 1;
+
+}
+
+//Requiert des vitesses en rpm
+void set_speed(Point speeds){
+  double coef = 100 / (MAX_SPEED * REDUC);
+  if(speeds.getX()>0){
+    write_duty_ns(1,int((speeds.getX()*coef)*PERIOD));
+    sens_rotation(1,0);
+  }
+  else{
+    write_duty_ns(1,int((-speeds.getX()*coef)*PERIOD));
+    sens_rotation(1,1);
+  }
+  if(speeds.getY()>0){
+    write_duty_ns(2,int((speeds.getY()*coef)*PERIOD));
+    sens_rotation(2,0);
+  }
+  else{
+    write_duty_ns(2,int((-speeds.getY()*coef)*PERIOD));
+    sens_rotation(2,1);
+  }
 
 }
 

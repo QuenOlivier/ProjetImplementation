@@ -1,12 +1,10 @@
-#include "BBBexample.h"
-
+#include "BBBexample.hpp"
 
 using std::cout;
 using std::endl;
 using namespace BBB;
 
-#define MOTOR_TWO 2
-#define PERIOD 100000
+
 int posInit=0;
 int posInit_M1=0;
 int posInit_M2=0;
@@ -268,27 +266,7 @@ void initialisation_pins(){
 
 }
 
-//Requiert des vitesses en rpm
-void set_speed(Point speeds){
-  coef= 100 / (MAX_SPEED * REDUC);
-  if(speeds.getX()>0){
-    write_duty_ns(1,int((speeds.getX()*coef)*PERIOD);
-    sens_rotation(1,0);
-  }
-  else{
-    write_duty_ns(1,int((-speeds.getX()*coef)*PERIOD));
-    sens_rotation(1,1);
-  }
-  if(speeds.getY()>0){
-    write_duty_ns(2,int((speeds.getY()*coef)*PERIOD);
-    sens_rotation(2,0);
-  }
-  else{
-    write_duty_ns(2,int((-speeds.getY()*coef)*PERIOD));
-    sens_rotation(2,1);
-  }
 
-}
 
 int main(int argc, char const *argv[]) {
 
@@ -336,7 +314,6 @@ int main(int argc, char const *argv[]) {
 
   return 0;
 }
-
 
 
 

@@ -63,7 +63,7 @@ double read_eqep(int moteur){
 
     cout<<"Moteur 1 "<<endl;
     //cout<<"pos (brut): "<< pos<<endl;
-    //cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
+    cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
     cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
 
     return pos/(360*4)*2*M_PI;
@@ -84,7 +84,7 @@ double read_eqep(int moteur){
     //cout<<"copy eqep : "<< copy_eqep<<endl;                   // -23059574
     //cout<<"posInit : "<< posInit_M2<<endl;
     //cout<<"pos (brut): "<< pos<<endl;
-    //cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
+    cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
     cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
 
     return pos/(360*4)*2*M_PI;
@@ -316,13 +316,13 @@ int main(int argc, char const *argv[]) {
 
  //Ecriture period, duty, run
   reset_run();
-  write_period_ns(1,90000);
+  write_period_ns(1,100000);
   usleep(500000); //pour laisser le temps a write_period_ns d'ecrire dans la BBB
-  write_duty_ns(1,51000);//P8.19
+  write_duty_ns(1,30000);//P8.19
   usleep(500000);
-  write_period_ns(2,90000);
+  write_period_ns(2,100000);
   usleep(500000); //pour laisser le temps a write_period_ns d'ecrire dans la BBB
-  write_duty_ns(2,51000); //P8.13
+  write_duty_ns(2,30000); //P8.13
   usleep(500000);
   set_run();
   usleep(500000);
@@ -331,13 +331,14 @@ int main(int argc, char const *argv[]) {
   double pos2 = read_eqep(2);
   int count=0;
   //while(count < 50){
-  while(count < 200){
+  while(pos2 < 10){
     //Lecture encodeur
     pos1 = read_eqep(1);
     pos2 = read_eqep(2);
-    usleep(1000);
+    usleep(100);
     count++;
   }
+  sens_rotation(2,0);
   reset_run();
 
   return 0;

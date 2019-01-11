@@ -1,20 +1,19 @@
-CXX = g++
+CXXFLAGS = -g -Wall
 RM = rm
+SRCS = $(wildcard *.cpp)
 
-CFLAGS = ``
-LIBS = `BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.h` `BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.h`
+PROGRAM = BBBexample
+OBJS = $(notdir $(SRCS:.cpp=.o))
 
-TARGET = BBBexample 
+all: $(PROGRAM)
 
-OBJS = BBBexample.o 
 
-all: $(TARGET)
-
-$(TARGET): $(OBJS)
-	$(CXX) -o $@ $^ $(CFLAGS) $(LIBS)
 	
 %.o: %.cpp
-	$(CXX) -c $(CFLAGS) $<
+	$(CXX) -MT $@ -MD -MP -MF $*.Tpo -c -o $@ $(CXXFLAGS) $<
+
+$(PROGRAM): $(OBJS)
+	$(CXX) -o $(PROGRAM) $(OBJS) $(LIBS)
 
 clean: 
-	$(RM) -f *.o $(TARGET)
+	$(RM) -f *.o $(PROGRAM)
