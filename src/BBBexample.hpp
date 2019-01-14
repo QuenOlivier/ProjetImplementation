@@ -11,8 +11,7 @@
 #include <math.h>
 #include "asservissement.hpp"
 
-#define REDUC (10/19)
-#define MAX_SPEED 6680
+
 #define MOTOR_TWO 2
 #define PERIOD 100000
 

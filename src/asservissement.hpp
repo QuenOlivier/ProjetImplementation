@@ -13,8 +13,7 @@
 #include "../BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.h"
 #include "../BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.h"
 #include "../eQEP/bbb-eqep.h"
-#define _USE_MATH_DEFINES
-#define TIMESTEP 0.5 //En secondes
+
 
 class Point{
   private:

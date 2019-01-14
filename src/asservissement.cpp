@@ -2,6 +2,11 @@
 #include "asservissement.hpp"
 #include "BBBexample.hpp"
 
+#define _USE_MATH_DEFINES
+#define TIMESTEP 0.5 //En secondes
+#define REDUC (10/19)
+#define MAX_SPEED 6680
+
 //#include "BBB-eQEP-master/src/bbb-eqep.cpp"
 //Valeurs bornes : x(0,9), y(3, 14)
 
@@ -98,7 +103,9 @@ int reach_point(Point &target, Point &PosInit){
 
 //Requiert des vitesses en rpm
 void set_speed(Point speeds){
-  double coef = 100 / (MAX_SPEED * REDUC);
+  double temp = MAX_SPEED * REDUC;
+  cout << temp << endl;
+  double coef = 100 / temp;
   if(speeds.getX()>0){
     write_duty_ns(1,int((speeds.getX()*coef)*PERIOD));
     sens_rotation(1,0);
