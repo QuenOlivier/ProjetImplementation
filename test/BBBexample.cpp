@@ -281,29 +281,29 @@ void sens_rotation(int moteur, int sens){
 }
 
 Point PID(Point angle_des, Point angle_mes, Point &integral, Point &erreur_preced, double dt){
-	Point Kp = new Point(0,0);
-	Point Kd = new Point(0,0);
-	Point Ki = new Point(0,0);
-	Point max = new Point(2,2);
-	Point min = new Point(-2,-2);
+	Point Kp(0,0);
+	Point Kd(0,0);
+	Point Ki(0,0);
+	Point max(2,2);
+	Point min(-2,-2);
 
 	 // Calculate error
-    Point erreur = new Point(angle_des.getX() - angle_mes.getX(), angle_des.getY() - angle_mes.getY());
+    Point erreur(angle_des.getX() - angle_mes.getX(), angle_des.getY() - angle_mes.getY());
 
     // Proportional term
-    Point Pout = new Point(Kp.getX() * erreur.getX(), Kp.getY() * erreur.getY());
+    Point Pout(Kp.getX() * erreur.getX(), Kp.getY() * erreur.getY());
 
     // Integral term
 
-	integral.set(integral.getX() + erreur.getX() * dt, integral.getY() += erreur.getY() * dt);
-    Point Iout = new Point(Ki.getX() * integral.getX(), Ki.getY() * integral.getY());
+	integral.set(integral.getX() + erreur.getX() * dt, integral.getY() + erreur.getY() * dt);
+    Point Iout(Ki.getX() * integral.getX(), Ki.getY() * integral.getY());
 
     // Derivative term
-    Point derivative = new Point((erreur.getX() - erreur_preced.getX()) / dt, (erreur.getY() - erreur_preced.getY()) / dt);
-    Point Dout = new Point(Kd.getX() * derivative.getX(), Kd.getY() * derivative.getY());
+    Point derivative((erreur.getX() - erreur_preced.getX()) / dt, (erreur.getY() - erreur_preced.getY()) / dt);
+    Point Dout(Kd.getX() * derivative.getX(), Kd.getY() * derivative.getY());
 
     // Calculate total output
-    Point output = new Point(Pout.getX() + Iout.getX() + Dout.getX(), Pout.getY() + Iout.getY() + Dout.getY());
+    Point output(Pout.getX() + Iout.getX() + Dout.getX(), Pout.getY() + Iout.getY() + Dout.getY());
 
     // Restrict to max/min
     if( output.getX() > max.getX() )
@@ -353,8 +353,8 @@ int main(int argc, char const *argv[]) {
 
   int eqep_num;
   uint32_t eqep_pos =0;
-  Point integral = new Point(0,0);
-  Point erreur_preced = new Point(0,0);
+  Point integral(0,0);
+  Point erreur_preced(0,0);
 
   if(argc < 2)
   {
