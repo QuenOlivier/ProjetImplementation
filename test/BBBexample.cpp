@@ -25,6 +25,27 @@ int posInit=0;
 int posInit_M1=0;
 int posInit_M2=0;
 
+
+class Point{
+  private:
+    double _x;
+    double _y;
+
+  public:
+    Point();
+    Point(double x, double y);
+    void setX(double x){this->_x=x;}
+    void setY(double y){this->_y=y;}
+    void set(double x, double y){
+      this->_y=y;
+      this->_x=x;
+    }
+    double getX(){return this->_x;}
+    double getY(){return this->_y;}
+    double dist(Point &cible);
+};
+
+
 // Retourne la pos brute  du moteur
 void read_eqep_init(){
   std::ifstream eqep_folder_m1;
@@ -267,37 +288,36 @@ Point PID(Point angle_des, Point angle_mes, Point &integral, Point &erreur_prece
 	Point min = new Point(-2,-2);
 
 	 // Calculate error
-    Point erreur = new Point(angle_des.x - angle_mes.x, angle_des.y - angle_mes.y);
+    Point erreur = new Point(angle_des.getX() - angle_mes.getX(), angle_des.getY() - angle_mes.getY());
 
     // Proportional term
-    Point Pout = new Point(Kp.x * erreur.x, Kp.y * erreur.y);
+    Point Pout = new Point(Kp.getX() * erreur.getX(), Kp.getY() * erreur.getY());
 
     // Integral term
-    integral.x += erreur.x * dt;
-    integral.y += erreur. y* dt;
-    Point Iout = new Point(Ki.x * integral.x, Ki.y * integral.y);
+
+	integral.set(integral.getX() + erreur.getX() * dt, integral.getY() += erreur.getY() * dt);
+    Point Iout = new Point(Ki.getX() * integral.getX(), Ki.getY() * integral.getY());
 
     // Derivative term
-    Point derivative = new Point((erreur.x - erreur_preced.x) / dt, (erreur.y - erreur_preced.y) / dt);
-    Point Dout = new Point(Kd.x * derivative.x, Kd.y * derivative.y);
+    Point derivative = new Point((erreur.getX() - erreur_preced.getX()) / dt, (erreur.getY() - erreur_preced.getY()) / dt);
+    Point Dout = new Point(Kd.getX() * derivative.getX(), Kd.getY() * derivative.getY());
 
     // Calculate total output
-    Point output = new Point(Pout.x + Iout.x + Dout.x, Pout.y + Iout.y + Dout.y);
+    Point output = new Point(Pout.getX() + Iout.getX() + Dout.getX(), Pout.getY() + Iout.getY() + Dout.getY());
 
     // Restrict to max/min
-    if( output.x > max.x )
-        output.x = max.x;
-    else if( output.x < min.x )
-        output.x = min.x;
+    if( output.getX() > max.getX() )
+        output.setX(max.getX());
+    else if( output.getX() < min.getX() )
+        output.setX(min.getX());
 
-    if( output.y > max.y )
-        output.y = max.y;
-    else if( output.y < min.y )
-        output.y = min.y;
+    if( output.getY() > max.getY() )
+        output.setY(max.getY());
+    else if( output.getY() < min.getY() )
+        output.setY(min.getY());
 
     // Save error to previous error
-    erreur_preced.x = erreur.x;
-    erreur_preced.y = erreur.y;
+    erreur_preced.set(erreur.getX(), erreur.getY());
 
 	return output;
 }
