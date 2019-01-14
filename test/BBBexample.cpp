@@ -5,9 +5,10 @@
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>
-#include<stdio.h>
+#include <stdio.h>
 #include <string>
 #include <math.h>
+#include <time.h>
 
 #include "BBB-eQEP-master/src/bbb-eqep.cpp"
 
@@ -258,6 +259,49 @@ void sens_rotation(int moteur, int sens){
   }
 }
 
+Point PID(Point angle_des, Point angle_mes, Point &integral, Point &erreur_preced, double dt){
+	Point Kp = new Point(0,0);
+	Point Kd = new Point(0,0);
+	Point Ki = new Point(0,0);
+	Point max = new Point(2,2);
+	Point min = new Point(-2,-2);
+
+	 // Calculate error
+    Point erreur = new Point(angle_des.x - angle_mes.x, angle_des.y - angle_mes.y);
+
+    // Proportional term
+    Point Pout = new Point(Kp.x * erreur.x, Kp.y * erreur.y);
+
+    // Integral term
+    integral.x += erreur.x * dt;
+    integral.y += erreur. y* dt;
+    Point Iout = new Point(Ki.x * integral.x, Ki.y * integral.y);
+
+    // Derivative term
+    Point derivative = new Point((erreur.x - erreur_preced.x) / dt, (erreur.y - erreur_preced.y) / dt);
+    Point Dout = new Point(Kd.x * derivative.x, Kd.y * derivative.y);
+
+    // Calculate total output
+    Point output = new Point(Pout.x + Iout.x + Dout.x, Pout.y + Iout.y + Dout.y);
+
+    // Restrict to max/min
+    if( output.x > max.x )
+        output.x = max.x;
+    else if( output.x < min.x )
+        output.x = min.x;
+
+    if( output.y > max.y )
+        output.y = max.y;
+    else if( output.y < min.y )
+        output.y = min.y;
+
+    // Save error to previous error
+    erreur_preced.x = erreur.x;
+    erreur_preced.y = erreur.y;
+
+	return output;
+}
+
 // Initialise les pins en tous genres : eqep, pwm, etc... utilises par les deux moteurs
 void initialisation_pins(){
 
@@ -289,6 +333,8 @@ int main(int argc, char const *argv[]) {
 
   int eqep_num;
   uint32_t eqep_pos =0;
+  Point integral = new Point(0,0);
+  Point erreur_preced = new Point(0,0);
 
   if(argc < 2)
   {
