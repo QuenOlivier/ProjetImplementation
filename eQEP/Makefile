@@ -2,17 +2,14 @@ CXX = g++
 RM = rm
 
 CFLAGS = ``
-LIBS = `BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.h` `BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.h`
+LIBS = ``
 
 SRCS = $(wildcard *.cpp)
 OBJS = $(notdir $(SRCS:.cpp=.o))
 
-TARGET = BBBexample
+TARGET = testGPIO
 
-all:
-	+$(MAKE) -C BeagleBoneBlack-GPIO-master
-	+$(MAKE) -C eQEP
-	+$(MAKE) -C src
+all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CXX) -o $@ $^ $(CFLAGS) $(LIBS)
