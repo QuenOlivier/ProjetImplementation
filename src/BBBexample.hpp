@@ -6,12 +6,13 @@
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>
-#include<stdio.h>
+#include <stdio.h>
 #include <string>
 #include <math.h>
 #include "asservissement.hpp"
 
-
+#define ANGLE_M1 M_PI
+#define ANGLE_M2 (M_PI/2)
 #define MOTOR_TWO 2
 #define PERIOD 100000
 

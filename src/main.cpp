@@ -11,45 +11,29 @@ using std::endl;
 
 int main(int argc, char const *argv[]) {
 
-  int eqep_num;
-  uint32_t eqep_pos =0;
-
-  if(argc < 2)
-  {
-    cout << "Usage: " << argv[0] << " 0|1|2" << endl;
-    cout << "Requires the number for which eQEP to open\n";
-    return 1;
-  }
-  if (strtol(argv[1],NULL,0) >= 0 && strtol(argv[1],NULL,0) <= 2) {
-    eqep_num = strtol(argv[1],NULL,0);
-  }
-  else {
-    cout << "Try again." << endl;
-    return 1;
-  }
-
   initialisation_pins();
+  reset_run();
 
   //EQUEP
   //BBB::eQEP encodeurs=new BBB::eQEP(eqep_num);
   //Lecture encodeur
-  Point PosInit=read_eqep_init(); // Stockage de la pos init brute
-
-  sens_rotation(1,1);
-  sens_rotation(2,1);
+  do
+  {
+    cout << '\n' << "Press [ENTER] when robot is set...";
+  } while (std::cin.get() != '\n');
+  Point posInit=read_eqep_init(); // Stockage de la pos init brute
 
  //Ecriture period, duty, run
-  reset_run();
-  write_period_ns(2,PERIOD);
+  write_period_ns(1,PERIOD);
   usleep(500000); //pour laisser le temps a write_period_ns d'ecrire dans la BBB
-  write_duty_ns(2,51000); //P8.13
+  write_period_ns(2,PERIOD); //P8.13
   usleep(500000);
   set_run();
   usleep(500000);
 
   Point test(0,0.1);
 
-  reach_point(test,PosInit);
+  reach_point(test,posInit);
 
   reset_run();
 

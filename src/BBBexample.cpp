@@ -5,7 +5,15 @@ using std::cout;
 using std::endl;
 using namespace BBB;
 
-// Sauvegarde la pos brute initiale du moteur
+///
+/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
+/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
+/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
+/// \param[in] dt Intervalle de temps entre les deux mesures
+/// \param[out] Point Les commandes a envoyer a chaque moteur
+///
 Point read_eqep_init(){
   std::ifstream eqep_folder_m1;
   eqep_folder_m1.open("/sys/devices/ocp.3/48300000.epwmss/48300180.eqep/position");
@@ -26,7 +34,15 @@ Point read_eqep_init(){
   return Point(copy_eqep1,copy_eqep2);
 }
 
-// Retourne la pos en radians  du moteur
+///
+/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
+/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
+/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
+/// \param[in] dt Intervalle de temps entre les deux mesures
+/// \param[out] Point Les commandes a envoyer a chaque moteur
+///
 double read_eqep(int moteur, Point &posInit){
   if(moteur == 1){
     std::ifstream eqep_folder;
@@ -38,13 +54,15 @@ double read_eqep(int moteur, Point &posInit){
     //double eqep = copy_eqep/(360*4);
 
     double pos = copy_eqep - posInit.getX();
+    double posTrue = ANGLE_M1 + 10*pos/(360*4)*2*M_PI/19;
 
-    cout<<"Moteur 1 "<<endl;
-    //cout<<"pos (brut): "<< pos<<endl;
-    //cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
-    cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
+    /*cout<<"Moteur 1 "<<endl;
+    cout<<"pos (brut): "<< pos<<endl;
+    cout<<"pos : "<< pos/(360*4)*2*M_PI<<endl;
+    cout<<"posTrue: "<< posTrue<<"\n"<<endl;
 
-    return pos/(360*4)*2*M_PI;
+    usleep(500000);*/
+    return posTrue;
   }
   else if(moteur == 2){
 
@@ -57,15 +75,17 @@ double read_eqep(int moteur, Point &posInit){
     //double eqep = copy_eqep/(360*4);
 
     double pos = copy_eqep - posInit.getY();
+    double posTrue = ANGLE_M2 + 10*pos/(360*4)*2*M_PI/19;
 
-    cout<<"Moteur 2 "<<endl;
+    /*cout<<"Moteur 2 "<<endl;
     //cout<<"copy eqep : "<< copy_eqep<<endl;                   // -23059574
     //cout<<"posInit : "<< posInit_M2<<endl;
-    //cout<<"pos (brut): "<< pos<<endl;
-    //cout<<"pos (nb tours): "<< pos/(360*4)<<endl;
-    cout<<"pos (rad): "<< pos/(360*4)*2*M_PI<<"\n"<<endl;
+    cout<<"pos (brut): "<< pos<<endl;
+    cout<<"pos : "<< pos/(360*4)*2*M_PI<<endl;
+    cout<<"posTrue (rad): "<< posTrue<<"\n"<<endl;
 
-    return pos/(360*4)*2*M_PI;
+    usleep(500000);*/
+    return posTrue;
   }
   else{
     cout<<"Mauvais numéro de moteur"<<endl;
@@ -75,7 +95,15 @@ double read_eqep(int moteur, Point &posInit){
 }
 
 
-// Ecriture period_ns
+///
+/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
+/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
+/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
+/// \param[in] dt Intervalle de temps entre les deux mesures
+/// \param[out] Point Les commandes a envoyer a chaque moteur
+///
 void write_period_ns(int moteur, int p){
   if(moteur ==1){
     char buffer[50];
@@ -114,7 +142,15 @@ void write_period_ns(int moteur, int p){
   }
 }
 
-// Ecriture duty_ns
+///
+/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
+/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
+/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
+/// \param[in] dt Intervalle de temps entre les deux mesures
+/// \param[out] Point Les commandes a envoyer a chaque moteur
+///
 void write_duty_ns(int moteur, int d){
   if(moteur == 1){
     char buffer[50];
@@ -153,7 +189,15 @@ void write_duty_ns(int moteur, int d){
   }
 }
 
-// Run à 1
+///
+/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
+/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
+/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
+/// \param[in] dt Intervalle de temps entre les deux mesures
+/// \param[out] Point Les commandes a envoyer a chaque moteur
+///
 void set_run(){
   char buffer[50];
   char buffer2_m1[200] = "echo ";
@@ -201,7 +245,16 @@ void reset_run(){
   std::system(buffer2_m2);
 
 }
-// Moteur 1 ou 2 (pour moteur gauche ou droite) et sens 0 ou 1 (pour sens trigo ou anti)
+
+///
+/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
+/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
+/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
+/// \param[in] dt Intervalle de temps entre les deux mesures
+/// \param[out] Point Les commandes a envoyer a chaque moteur
+///
 void sens_rotation(int moteur, int sens){
   if(moteur == 1){
     if(sens==0){
@@ -230,7 +283,15 @@ void sens_rotation(int moteur, int sens){
   }
 }
 
-// Initialise les pins en tous genres : eqep, pwm, etc... utilises par les deux moteurs
+///
+/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
+/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
+/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
+/// \param[in] dt Intervalle de temps entre les deux mesures
+/// \param[out] Point Les commandes a envoyer a chaque moteur
+///
 void initialisation_pins(){
 
   std::system("config-pin overlay cape-universaln");
@@ -244,8 +305,8 @@ void initialisation_pins(){
   std::system("echo 5 > /sys/class/pwm/export");
 
   //Moteur 2
-  std::system("config-pin P8.11 qep" ); //Pour Pauline : fil bleu
-  std::system("config-pin P8.12 qep" ); //Pour Pauline : fil jaune
+  std::system("config-pin P8.11 qep" ); //Pour Pauline : fil jaune
+  std::system("config-pin P8.12 qep" ); //Pour Pauline : fil bleu
   std::system("config-pin P8.13 pwm" );   //E2
   std::system("config-pin P8.8 output");   //(gpio67) pour commander le sens de rotation //M2
   std::system("echo 6 > /sys/class/pwm/export");
@@ -277,16 +338,7 @@ void initialisation_pins(){
 //scp BBBexample debian@192.168.7.2:~/
 
 
-/*Connection à la carte :
-ssh debian@192.168.7.2
-dans un autre terminal, envoyer le fichier ProjetImplementation à la carte : scp -r ProjetImplementation debian@192.168.7.2:.
-retourner dans le terminal de la carte, puis dans ProjetImplementation compiler le tout : g++ BeagleBoneBlack-GPIO-master/GPIO/GPIOConst.cpp  BeagleBoneBlack-GPIO-master/GPIO/GPIOManager.cpp BBBexample.cpp -o BBBexample
-executer le code (en root (commande : sudo su)(exit root)) : ./BBBexample 2
-pour acceder a period_ns, duty_ns, run du pwm que vous avez cree dans le programme : cd /sys/class/pwm/"pwm que vous avez cree"
-puis cat period_ns, cat duty_ns etc pour verifier
-
-
-Pour allumer et eteindre une led à la main depuis le terminal de la beaglebone :
+/*Pour allumer et eteindre une led à la main depuis le terminal de la beaglebone :
 
 dans sys/class/gpio : echo 66 > export    (avec 66 le numero du GPIO qui nous interesse)
 dans sys/class/gpio/gpio66 : echo "out" > direction   (pour dire que l'on veut que ce gpio soit une sortie)
