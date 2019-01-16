@@ -3,7 +3,7 @@
 #include "BBBexample.hpp"
 
 #define _USE_MATH_DEFINES
-#define TIMESTEP 0.2 //En secondes
+#define TIMESTEP 0.5 //En secondes
 #define REDUC (10.0/19.0)
 #define MAX_SPEED 6680
 
@@ -81,6 +81,15 @@ Point mgi(Point &posEffecteur){
   return Point(thetag+phig,thetad-phid);
 }
 
+double val_abs(double val){
+  if(val<0){
+    return -val;
+  }
+  else{
+    return val;
+  }
+}
+
 
 ///
 /// \fn int reach_point(Point &target, Point &PosInit)
@@ -107,31 +116,28 @@ int reach_point(Point &target, Point &posInit){
   //Calcul vitesse necessaire
   Point speeds(commande.getX()*60/(2*M_PI),commande.getY()*60/(2*M_PI));
 
-  //Lancement des moteurs
-  set_speed(speeds);
   clock_t chronoPreced = clock();
   bool reached=false;
 
   while(!reached){
     //VERIF QUE LE POINT N'A PAS ETE ATTEINT
-    cout<<"ON A PAS ATTEINT LE POINT...."<<endl;
+    //cout<<"ON A PAS ATTEINT LE POINT...."<<endl;
 
     angleCurrent.set(read_eqep(1,posInit),read_eqep(2,posInit));
-    cout<<"Angle courant ="<<angleCurrent.getX()<<", "<<angleCurrent.getY()<<endl;
+    //cout<<"Angle courant ="<<angleCurrent.getX()<<", "<<angleCurrent.getY()<<endl;
     diff.set(angleToReach.getX()-angleCurrent.getX(),angleToReach.getY()-angleCurrent.getY());
-    cout<<"Diff ="<<diff.getX()<<", "<<diff.getY()<<endl;
-    bool angle1= (abs(diff.getX())<0.1 && abs(diffPreced.getX())<0.1);
-    bool angle2= (abs(diff.getY())<0.1 && abs(diffPreced.getY())<0.1);
-    cout<<angle1<<", "<<angle2<<endl;
+    //cout<<"Diff ="<<diff.getX()<<", "<<diff.getY()<<endl;
+    bool angle1= (val_abs(diff.getX())<0.1 && val_abs(diffPreced.getX())<0.1);
+    bool angle2= (val_abs(diff.getY())<0.1 && val_abs(diffPreced.getY())<0.1);
     double dt=clock()-chronoPreced;
     commande=pid(diff, integ, diffPreced, dt);
-    cout<<"Commande ="<<commande.getX()<<", "<<commande.getY()<<endl;
-    speeds.set(commande.getX()*60/(2*M_PI),commande.getY()*60/(2*M_PI));
+    //cout<<"Commande ="<<commande.getX()<<", "<<commande.getY()<<endl;
+    speeds.set(commande.getX()*60/(2*M_PI*TIMESTEP),commande.getY()*60/(2*M_PI*TIMESTEP));
     set_speed(speeds);
 
     chronoPreced=clock();
 
-
+    //usleep(100000);
 
 
     if(angle1 && angle2){
@@ -153,8 +159,8 @@ int reach_point(Point &target, Point &posInit){
 /// \param[out] Point Les commandes a envoyer a chaque moteur
 ///
 Point pid(Point &error, Point &integral, Point &errorPreced, double dt){
-  Point Kp(5,5);
-  Point Kd(0.5,0.5);
+  Point Kp(100,100);
+  Point Kd(10,10);
   Point Ki(0,0);
   Point max(2,2);
   Point min(-2,-2);
@@ -202,19 +208,19 @@ void set_speed(Point speeds){
   double coef = 100 / temp;
   if(speeds.getX()>0){
     write_duty_ns(1,std::min(PERIOD,int((speeds.getX()*coef)*PERIOD)));
-    sens_rotation(1,0);
+    sens_rotation(1,1);
   }
   else{
     write_duty_ns(1,std::min(PERIOD,int((-speeds.getX()*coef)*PERIOD)));
-    sens_rotation(1,1);
+    sens_rotation(1,0);
   }
   if(speeds.getY()>0){
     write_duty_ns(2,std::min(PERIOD,int((speeds.getY()*coef)*PERIOD)));
-    sens_rotation(2,0);
+    sens_rotation(2,1);
   }
   else{
     write_duty_ns(2,std::min(PERIOD,int((-speeds.getY()*coef)*PERIOD)));
-    sens_rotation(2,1);
+    sens_rotation(2,0);
   }
 
 }
