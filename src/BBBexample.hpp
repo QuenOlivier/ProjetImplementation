@@ -1,3 +1,8 @@
+///
+/// \file BBBexample.hpp
+/// \brief Fichier header pour BBBexample.cpp
+/// \author Quentin.OLIVIER
+///
 #ifndef BBBEX
 #define BBBEX
 

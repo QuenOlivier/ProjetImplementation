@@ -44,7 +44,7 @@ class Point{
 };
 
 Point mgi(Point &posEffecteur);
-int reach_point(Point &target, Point &PosInit);
+int reach_point(Point &target, Point &posInit);
 int follow_path(std::list<Point> path, Point &posInit);
 Point pid(Point &error, Point &integral, Point &erroPreced, double dt);
 void set_speed(Point speeds);

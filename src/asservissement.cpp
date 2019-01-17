@@ -1,4 +1,8 @@
-
+///
+/// \file asservissement.cpp
+/// \brief Fichier regroupant toute l'algorithmique concernant le controle des moteurs
+/// \author Quentin.OLIVIER
+///
 #include "asservissement.hpp"
 #include "BBBexample.hpp"
 
@@ -7,7 +11,6 @@
 #define REDUC (10.0/19.0)
 #define MAX_SPEED 6680
 
-//#include "BBB-eQEP-master/src/bbb-eqep.cpp"
 //Valeurs bornes : x(0,9), y(3, 14)
 
 using std::cout;
@@ -81,6 +84,12 @@ Point mgi(Point &posEffecteur){
   return Point(thetag+phig,thetad-phid);
 }
 
+///
+/// \fn double val_abs(double val)
+/// \brief Fonction permettant de calculer la valeu absolue d'un double
+/// \param[in] val La valeur dont on désire la valeur absolue
+/// \param[out] double La valeur absolue
+///
 double val_abs(double val){
   if(val<0){
     return -val;
@@ -153,7 +162,7 @@ int reach_point(Point &target, Point &posInit){
 /// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
 /// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
 /// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
+/// \param[in] integral La somme des erreurs depuis le debut de l'asservissement en position en cours
 /// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
 /// \param[in] dt Intervalle de temps entre les deux mesures
 /// \param[out] Point Les commandes a envoyer a chaque moteur
@@ -225,9 +234,16 @@ void set_speed(Point speeds){
 
 }
 
-int follow_path(std::list<Point> path, Point &PosInit){
+///
+/// \fn int follow_path(std::list<Point> path, Point &PosInit)
+/// \brief Fonction permettant d'envoyer les vitesses desirees en rpm au moteur
+/// \param[in] path La trajectoire a suivre pour le moteur 
+/// \param[in] posInit Le tuple des valeurs initiales brutes des encodeurs
+/// \param[out] int Une valeur standardisee d'erreur
+///
+int follow_path(std::list<Point> path, Point &posInit){
   while(path.size() != 0){
-    reach_point(path.front(), PosInit);
+    reach_point(path.front(), posInit);
     path.pop_front();
   }
   return 1;

@@ -1,3 +1,8 @@
+///
+/// \file BBBexample.cpp
+/// \brief Fichier regroupant le code bas-niveau pour utiliser la carte BBB
+/// \author Thomas.LEFEVRE Pauline.
+///
 #include "BBBexample.hpp"
 #include "asservissement.hpp"
 
@@ -6,13 +11,9 @@ using std::endl;
 using namespace BBB;
 
 ///
-/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
-/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
-/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
-/// \param[in] dt Intervalle de temps entre les deux mesures
-/// \param[out] Point Les commandes a envoyer a chaque moteur
+/// \fn Point read_eqep_init()
+/// \brief Fonction permettant de recuperer la valeur initiale des encodeurs
+/// \param[out] Point Le tuple des valeurs initiales brutes des encodeurs
 ///
 Point read_eqep_init(){
   std::ifstream eqep_folder_m1;
@@ -27,21 +28,17 @@ Point read_eqep_init(){
   int copy_eqep2;
   eqep_folder_m1 >> copy_eqep1;
   eqep_folder_m2 >> copy_eqep2;
-  cout<<"posInit1 : "<< copy_eqep1<<endl;
-  cout<<"posInit2 : "<< copy_eqep2<<endl;
 
   //Lecture encodeur
   return Point(copy_eqep1,copy_eqep2);
 }
 
 ///
-/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
-/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
-/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
-/// \param[in] dt Intervalle de temps entre les deux mesures
-/// \param[out] Point Les commandes a envoyer a chaque moteur
+/// \fn double read_eqep(int moteur, Point &posInit)
+/// \brief Fonction permettant de recuperer l'orientation d'un moteur
+/// \param[in] moteur Le numero du moteur duquel on recupere l'orientation
+/// \param[in] posInit Le tuple des valeurs initiales brutes des encodeurs
+/// \param[out] double La valeur d'angle courante du moteur choisi
 ///
 double read_eqep(int moteur, Point &posInit){
   if(moteur == 1){
@@ -55,13 +52,6 @@ double read_eqep(int moteur, Point &posInit){
 
     double pos = copy_eqep - posInit.getX();
     double posTrue = ANGLE_M1 + 10*pos/(360*4)*2*M_PI/19;
-
-    /*cout<<"Moteur 1 "<<endl;
-    cout<<"pos (brut): "<< pos<<endl;
-    cout<<"pos : "<< pos/(360*4)*2*M_PI<<endl;
-    cout<<"posTrue: "<< posTrue<<"\n"<<endl;
-
-    usleep(500000);*/
     return posTrue;
   }
   else if(moteur == 2){
@@ -76,15 +66,6 @@ double read_eqep(int moteur, Point &posInit){
 
     double pos = copy_eqep - posInit.getY();
     double posTrue = ANGLE_M2 + 10*pos/(360*4)*2*M_PI/19;
-
-    /*cout<<"Moteur 2 "<<endl;
-    //cout<<"copy eqep : "<< copy_eqep<<endl;                   // -23059574
-    //cout<<"posInit : "<< posInit_M2<<endl;
-    cout<<"pos (brut): "<< pos<<endl;
-    cout<<"pos : "<< pos/(360*4)*2*M_PI<<endl;
-    cout<<"posTrue (rad): "<< posTrue<<"\n"<<endl;
-
-    usleep(500000);*/
     return posTrue;
   }
   else{
@@ -96,13 +77,10 @@ double read_eqep(int moteur, Point &posInit){
 
 
 ///
-/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
-/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
-/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
-/// \param[in] dt Intervalle de temps entre les deux mesures
-/// \param[out] Point Les commandes a envoyer a chaque moteur
+/// \fn void write_period_ns(int moteur, int p)
+/// \brief Fonction permettant d'ecrire la valeur de la periode du signal PWM controllant la vitesse du moteur choisi
+/// \param[in] moteur Le numero du moteur duquel on recupere l'orientation
+/// \param[in] p La valeur de la periode en milliseconde
 ///
 void write_period_ns(int moteur, int p){
   if(moteur ==1){
@@ -143,13 +121,10 @@ void write_period_ns(int moteur, int p){
 }
 
 ///
-/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
-/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
-/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
-/// \param[in] dt Intervalle de temps entre les deux mesures
-/// \param[out] Point Les commandes a envoyer a chaque moteur
+/// \fn void write_duty_ns(int moteur, int d)
+/// \brief Fonction permettant d'ecrire la valeur de la duree du cycle positif du signal PWM controllant la vitesse du moteur choisi
+/// \param[in] moteur Le numero du moteur pour lequel on regle le signal
+/// \param[in] d La duree du cycle positif en milliseconde
 ///
 void write_duty_ns(int moteur, int d){
   if(moteur == 1){
@@ -190,13 +165,8 @@ void write_duty_ns(int moteur, int d){
 }
 
 ///
-/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
-/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
-/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
-/// \param[in] dt Intervalle de temps entre les deux mesures
-/// \param[out] Point Les commandes a envoyer a chaque moteur
+/// \fn void set_run()
+/// \brief Autorise la rotation des moteurs
 ///
 void set_run(){
   char buffer[50];
@@ -215,13 +185,14 @@ void set_run(){
     buffer2_m1[5+n+j] = buffer3_m1[j];
     buffer2_m2[5+n+j] = buffer3_m2[j];
   }
-  cout<<"buffer :" << buffer2_m1 <<endl;
-  cout<<"buffer :" << buffer2_m2 <<endl;
   std::system(buffer2_m1);
   std::system(buffer2_m2);
 }
 
-// Run à 0
+///
+/// \fn void reset_run()
+/// \brief Desactive la rotation des moteurs
+///
 void reset_run(){
   char buffer[50];
   char buffer2_m1[200] = "echo ";
@@ -239,21 +210,16 @@ void reset_run(){
     buffer2_m1[5+n+j] = buffer3_m1[j];
     buffer2_m2[5+n+j] = buffer3_m2[j];
   }
-  cout<<"buffer :" << buffer2_m1 <<endl;
-  cout<<"buffer :" << buffer2_m2 <<endl;
   std::system(buffer2_m1);
   std::system(buffer2_m2);
 
 }
 
 ///
-/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
-/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
-/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
-/// \param[in] dt Intervalle de temps entre les deux mesures
-/// \param[out] Point Les commandes a envoyer a chaque moteur
+/// \fn void sens_rotation(int moteur, int sens)
+/// \brief Fonction permettant de regler le sens de rotation des moteurs
+/// \param[in] moteur Le numero du moteur pour lequel on regle le sens de rotation
+/// \param[in] sens 1 pour le sens trigonometrique, 0 sinon
 ///
 void sens_rotation(int moteur, int sens){
   if(moteur == 1){
@@ -264,7 +230,7 @@ void sens_rotation(int moteur, int sens){
       std::system("echo 1 > /sys/devices/virtual/gpio/gpio66/value");
     }
     else{
-      cout<<"Sens invalide (saisir 0 pour trigo ou 1)"<<endl;
+      cout<<"Sens invalide (saisir 1 pour trigo ou 0)"<<endl;
     }
   }
   else if(moteur == 2){
@@ -275,7 +241,7 @@ void sens_rotation(int moteur, int sens){
       std::system("echo 1 > /sys/devices/virtual/gpio/gpio67/value");
     }
     else{
-      cout<<"Sens invalide (saisir 0 pour trigo ou 1)"<<endl;
+      cout<<"Sens invalide (saisir 1 pour trigo ou 0)"<<endl;
     }
   }
   else{
@@ -284,13 +250,8 @@ void sens_rotation(int moteur, int sens){
 }
 
 ///
-/// \fn Point pid(Point &error, Point &integral, Point &errorPreced, double dt)
-/// \brief Fonction permettant d'asservir le moteur avec un correcteur pid
-/// \param[in] error Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] integral Le tuple d'erreur angulaire courante entre la position des moteurs et la position desiree
-/// \param[in] errorPreced Le tuple d'erreur angulaire precedent entre la position des moteurs et la position desiree
-/// \param[in] dt Intervalle de temps entre les deux mesures
-/// \param[out] Point Les commandes a envoyer a chaque moteur
+/// \fn void initialisation_pins()
+/// \brief Fonction permettant d'initialiser la configuration des pins souhaites sur la carte BBB
 ///
 void initialisation_pins(){
 
