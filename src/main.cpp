@@ -31,9 +31,23 @@ int main(int argc, char const *argv[]) {
   set_run();
   usleep(500000);
 
-  Point test(0,0.1);
+  //Valeurs bornes : x(0,0.09), y(0.03, 0.14)
+  //Valeurs en metre
+  Point test(-0.01, 0.1);
+  Point test2(-0.05, 0.1);
+  Point test3(-0.05, 0.06);
+  Point test4(-0.01, 0.06);
+  Point test5(-0.01, 0.1);
 
-  reach_point(test,posInit);
+  std::list<Point> path;
+
+  path.push_back(test);
+  path.push_back(test2);
+  path.push_back(test3);
+  path.push_back(test4);
+  path.push_back(test5);
+
+  follow_path(path,posInit);
 
   reset_run();
 

@@ -11,7 +11,7 @@
 #define REDUC (10.0/19.0)
 #define MAX_SPEED 6680
 
-//Valeurs bornes : x(0,9), y(3, 14)
+
 
 using std::cout;
 using std::endl;
@@ -168,8 +168,10 @@ int reach_point(Point &target, Point &posInit){
 /// \param[out] Point Les commandes a envoyer a chaque moteur
 ///
 Point pid(Point &error, Point &integral, Point &errorPreced, double dt){
-  Point Kp(100,100);
-  Point Kd(10,10);
+  Point Kp(1500,2000);
+  Point Kd(500,500);
+  /*Point Kp(10,1);
+  Point Kd(0,0);*/
   Point Ki(0,0);
   Point max(2,2);
   Point min(-2,-2);
@@ -215,20 +217,23 @@ Point pid(Point &error, Point &integral, Point &errorPreced, double dt){
 void set_speed(Point speeds){
   double temp = MAX_SPEED * REDUC;
   double coef = 100 / temp;
+  Point comm( int (speeds.getX()*coef) *PERIOD,int(speeds.getY()*coef)*PERIOD);
+  comm.setX(std::max(90000,int(comm.getX()) ) );
+  comm.setY(std::max(90000,int(comm.getY()) ) );
   if(speeds.getX()>0){
-    write_duty_ns(1,std::min(PERIOD,int((speeds.getX()*coef)*PERIOD)));
+    write_duty_ns(1,std::min(PERIOD,int(comm.getX())));
     sens_rotation(1,1);
   }
   else{
-    write_duty_ns(1,std::min(PERIOD,int((-speeds.getX()*coef)*PERIOD)));
+    write_duty_ns(1,std::min(PERIOD,int(comm.getX())));
     sens_rotation(1,0);
   }
   if(speeds.getY()>0){
-    write_duty_ns(2,std::min(PERIOD,int((speeds.getY()*coef)*PERIOD)));
+    write_duty_ns(2,std::min(PERIOD,int(comm.getY())));
     sens_rotation(2,1);
   }
   else{
-    write_duty_ns(2,std::min(PERIOD,int((-speeds.getY()*coef)*PERIOD)));
+    write_duty_ns(2,std::min(PERIOD,int(comm.getY())));
     sens_rotation(2,0);
   }
 
@@ -237,7 +242,7 @@ void set_speed(Point speeds){
 ///
 /// \fn int follow_path(std::list<Point> path, Point &PosInit)
 /// \brief Fonction permettant d'envoyer les vitesses desirees en rpm au moteur
-/// \param[in] path La trajectoire a suivre pour le moteur 
+/// \param[in] path La trajectoire a suivre pour le moteur
 /// \param[in] posInit Le tuple des valeurs initiales brutes des encodeurs
 /// \param[out] int Une valeur standardisee d'erreur
 ///
@@ -245,6 +250,14 @@ int follow_path(std::list<Point> path, Point &posInit){
   while(path.size() != 0){
     reach_point(path.front(), posInit);
     path.pop_front();
+    cout<<"Point atteint"<<endl;
+    cout<<"Reste "<<path.size()<<" point(s)"<<endl;
+    if(path.size() !=0){
+      cout<<"Coordonnees du point suivant :"<<path.front().getX()<<", "<<path.front().getY()<<endl;
+    }
+
+    usleep(1000000);
+
   }
   return 1;
 }
