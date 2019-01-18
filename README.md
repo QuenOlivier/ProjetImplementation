@@ -14,7 +14,7 @@ Le but de ce projet est de contrôler un robot parallèle à deux degrés de lib
 ## Equipe du projet 
 
 * Pauline GIL 
-* Thomas LEFEVRE
+* Thomas LEFEBVRE
 * Maël BERTRAND
 * Quentin OLIVIER (Wiki maintainer) : quentin.olivier1996@gmail.com
 
