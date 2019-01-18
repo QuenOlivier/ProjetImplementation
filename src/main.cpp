@@ -33,11 +33,11 @@ int main(int argc, char const *argv[]) {
 
   //Valeurs bornes : x(0,0.09), y(0.03, 0.14)
   //Valeurs en metre
-  Point test(-0.01, 0.1);
-  Point test2(-0.05, 0.1);
-  Point test3(-0.05, 0.06);
-  Point test4(-0.01, 0.06);
-  Point test5(-0.01, 0.1);
+  Point test(-0.02, 0.1);
+  Point test2(0.0, 0.1);
+  Point test3(-0.04, 0.1);
+  Point test4(-0.04, 0.06);
+  Point test5(-0.02, 0.1);
 
   std::list<Point> path;
 

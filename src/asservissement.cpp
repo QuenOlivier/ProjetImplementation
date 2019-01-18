@@ -218,8 +218,8 @@ void set_speed(Point speeds){
   double temp = MAX_SPEED * REDUC;
   double coef = 100 / temp;
   Point comm( int (speeds.getX()*coef) *PERIOD,int(speeds.getY()*coef)*PERIOD);
-  comm.setX(std::max(90000,int(comm.getX()) ) );
-  comm.setY(std::max(90000,int(comm.getY()) ) );
+  comm.setX(std::max(50000,int(comm.getX()) ) );
+  comm.setY(std::max(50000,int(comm.getY()) ) );
   if(speeds.getX()>0){
     write_duty_ns(1,std::min(PERIOD,int(comm.getX())));
     sens_rotation(1,1);
